@@ -7,14 +7,9 @@
     <style>
         :root {
             --sage-green: #b2ac88;
-            --muted-sage: #d4d0b8;
             --grid-color: #e8e8e8;
             --text-main: #555;
-            /* Motivation Palette */
-            --m-high: rgba(129, 199, 132, 0.6); /* Green */
-            --m-mid: rgba(255, 213, 79, 0.6);  /* Yellow/Orange */
-            --m-low: rgba(144, 202, 249, 0.6);  /* Blue */
-            --period-color: rgba(239, 154, 154, 0.7); /* Muted Red */
+            --period-color: rgba(239, 154, 154, 0.7);
         }
 
         body {
@@ -30,60 +25,89 @@
             align-items: center;
         }
 
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid var(--sage-green); padding-bottom: 10px; }
-        .container { width: 100%; max-width: 600px; background: rgba(255,255,255,0.7); padding: 20px; border-radius: 15px; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid var(--sage-green); padding-bottom: 10px; width: 100%; max-width: 600px; }
+        .container { width: 100%; max-width: 600px; padding-bottom: 150px; }
 
-        .entry-row { display: flex; align-items: flex-start; margin-bottom: 20px; padding: 10px; border-radius: 8px; transition: 0.3s; }
-        .day-info { font-weight: bold; min-width: 90px; color: var(--sage-green); font-size: 0.9rem; }
-        
-        .content-area { flex-grow: 1; outline: none; border-left: 2px solid var(--muted-sage); padding-left: 15px; min-height: 20px; }
-
-        /* Status Pills */
-        .status-tag { font-size: 0.7rem; text-transform: uppercase; padding: 2px 8px; border-radius: 10px; margin-left: 10px; font-weight: bold; }
-        .period-tag { background: var(--period-color); color: white; margin-top: 5px; display: inline-block; }
-
-        /* Analysis Section */
-        #analysis {
-            margin-top: 40px;
-            padding: 20px;
-            background: white;
-            border: 1px solid var(--sage-green);
-            border-radius: 10px;
-            width: 100%;
-            max-width: 550px;
+        .entry-row { 
+            display: flex; align-items: flex-start; margin-bottom: 15px; padding: 15px; 
+            border-radius: 12px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        .controls { position: fixed; bottom: 20px; display: flex; gap: 10px; }
+        .day-info { font-weight: bold; min-width: 80px; font-size: 0.85rem; opacity: 0.8; }
+        .content-area { flex-grow: 1; outline: none; padding-left: 15px; min-height: 24px; font-size: 1rem; }
+
+        .delete-btn {
+            cursor: pointer; font-size: 1.2rem; color: #999; margin-left: 10px;
+            transition: 0.2s; border: none; background: none;
+        }
+        .delete-btn:hover { color: #e5989b; }
+
+        /* UI Controls Area */
+        .controls-panel {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(250, 249, 246, 0.95);
+            padding: 20px; border-top: 1px solid var(--sage-green);
+            display: flex; flex-direction: column; align-items: center; gap: 15px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+        }
+
+        .slider-container { width: 80%; max-width: 400px; text-align: center; }
+        input[type=range] { width: 100%; cursor: pointer; accent-color: var(--sage-green); }
+
+        .btn-group { display: flex; gap: 10px; }
         button { 
-            padding: 12px 20px; border-radius: 25px; border: none; cursor: pointer; 
-            font-weight: bold; background: var(--sage-green); color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; 
+            font-weight: bold; background: var(--sage-green); color: white;
         }
         .btn-period { background: #e5989b; }
 
+        #analysis {
+            margin-bottom: 20px; padding: 15px; background: white;
+            border: 1px solid var(--sage-green); border-radius: 10px;
+            width: 100%; max-width: 550px; font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h2 style="color: var(--sage-green); margin: 0;">Monthly Cycle & Mindset</h2>
-        <small>Tracking patterns, one day at a time.</small>
+    </div>
+
+    <div id="analysis">
+        <p id="stats-text">Loading insights...</p>
     </div>
 
     <div class="container" id="diary-container"></div>
 
-    <div id="analysis">
-        <h3 style="color: var(--sage-green);">Monthly Insight</h3>
-        <p id="stats-text">Add entries to see your motivation vs. cycle analysis.</p>
-    </div>
-
-    <div class="controls">
-        <button onclick="addEntry('motivated')">High Energy</button>
-        <button onclick="addEntry('low')">Low Energy</button>
-        <button class="btn-period" onclick="addEntry('period')">+ Period Day</button>
+    <div class="controls-panel">
+        <div class="slider-container">
+            <small>Motivation Spectrum: <span id="val">Mid</span></small><br>
+            <input type="range" id="motivationRange" min="0" max="100" value="50" oninput="updateSliderLabel(this.value)">
+        </div>
+        <div class="btn-group">
+            <button onclick="addEntry('mood')">Add Log</button>
+            <button class="btn-period" onclick="addEntry('period')">+ Period Day</button>
+        </div>
     </div>
 
     <script>
         const container = document.getElementById('diary-container');
+
+        function updateSliderLabel(val) {
+            let label = "Mid";
+            if(val < 30) label = "Resting/Low";
+            if(val > 70) label = "High Energy";
+            document.getElementById('val').innerText = label;
+        }
+
+        function getColor(value) {
+            // Transitions from Blue (low) to Sage (high)
+            const r = Math.floor(144 + (178 - 144) * (value / 100));
+            const g = Math.floor(202 + (172 - 202) * (value / 100));
+            const b = Math.floor(249 + (136 - 249) * (value / 100));
+            return `rgba(${r}, ${g}, ${b}, 0.6)`;
+        }
 
         function addEntry(type) {
             const date = new Date();
@@ -92,21 +116,14 @@
             const div = document.createElement('div');
             div.className = 'entry-row';
             
-            let bgColor = 'transparent';
-            let tag = '';
-            
-            if(type === 'motivated') { bgColor = 'var(--m-high)'; tag = 'High Motivation'; }
-            if(type === 'low') { bgColor = 'var(--m-low)'; tag = 'Resting'; }
-            if(type === 'period') { bgColor = 'var(--period-color)'; tag = 'Period Cycle'; }
+            const val = document.getElementById('motivationRange').value;
+            const bgColor = (type === 'period') ? 'var(--period-color)' : getColor(val);
 
             div.style.backgroundColor = bgColor;
-
             div.innerHTML = `
-                <div class="day-info">
-                    ${dateStr}<br>
-                    <span class="status-tag">${tag}</span>
-                </div>
+                <div class="day-info">${dateStr}</div>
                 <div class="content-area" contenteditable="true" oninput="saveAndAnalyze()">...</div>
+                <button class="delete-btn" onclick="this.parentElement.remove(); saveAndAnalyze();">×</button>
             `;
             
             container.prepend(div);
@@ -114,23 +131,15 @@
         }
 
         function saveAndAnalyze() {
-            const html = container.innerHTML;
-            localStorage.setItem('diary_v2', html);
-            
-            // Basic Analysis Logic
+            localStorage.setItem('diary_v3', container.innerHTML);
             const entries = document.querySelectorAll('.entry-row').length;
-            const periods = document.querySelectorAll('.status-tag').textContent === 'Period Cycle'; // simplified
-            let periodCount = 0;
-            document.querySelectorAll('.status-tag').forEach(t => { if(t.innerText.includes('Period')) periodCount++; });
-            
-            const stats = document.getElementById('stats-text');
-            stats.innerHTML = `Total Logged Days: <b>${entries}</b> | Period Days: <b>${periodCount}</b><br>
-            <small>Tip: Look for clusters of "Resting" tags 2-3 days before a "Period Cycle" tag to predict your dip.</small>`;
+            document.getElementById('stats-text').innerHTML = `Total Logged Days: <b>${entries}</b>. Tap the × to remove any errors.`;
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('diary_v2');
+            const saved = localStorage.getItem('diary_v3');
             if(saved) container.innerHTML = saved;
+            saveAndAnalyze();
         };
     </script>
 </body>
