@@ -3,133 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Aesthetic Diary</title>
+    <title>Aesthetic Research & Life Tracker</title>
     <style>
         :root {
-            --bg-color: #fdfcf8;
-            --grid-color: #e0e0e0;
-            --text-color: #4a4a4a;
-            /* Watercolor Palette */
-            --hl-creative: rgba(255, 183, 77, 0.5); /* Orange */
-            --hl-motivated: rgba(129, 199, 132, 0.5); /* Green */
-            --hl-unmotivated: rgba(100, 181, 246, 0.5); /* Blue */
-            --hl-period: rgba(239, 154, 154, 0.6); /* Red/Pink */
+            --sage-green: #b2ac88;
+            --muted-sage: #d4d0b8;
+            --grid-color: #e8e8e8;
+            --text-main: #555;
+            /* Motivation Palette */
+            --m-high: rgba(129, 199, 132, 0.6); /* Green */
+            --m-mid: rgba(255, 213, 79, 0.6);  /* Yellow/Orange */
+            --m-low: rgba(144, 202, 249, 0.6);  /* Blue */
+            --period-color: rgba(239, 154, 154, 0.7); /* Muted Red */
         }
 
         body {
-            background-color: var(--bg-color);
-            background-image: 
-                linear-gradient(var(--grid-color) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-            background-size: 30px 30px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: var(--text-color);
-            margin: 0;
+            background-color: #faf9f6;
+            background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 25px 25px;
+            font-family: 'Georgia', serif;
+            color: var(--text-main);
             padding: 20px;
+            margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        .container {
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid var(--sage-green); padding-bottom: 10px; }
+        .container { width: 100%; max-width: 600px; background: rgba(255,255,255,0.7); padding: 20px; border-radius: 15px; }
+
+        .entry-row { display: flex; align-items: flex-start; margin-bottom: 20px; padding: 10px; border-radius: 8px; transition: 0.3s; }
+        .day-info { font-weight: bold; min-width: 90px; color: var(--sage-green); font-size: 0.9rem; }
+        
+        .content-area { flex-grow: 1; outline: none; border-left: 2px solid var(--muted-sage); padding-left: 15px; min-height: 20px; }
+
+        /* Status Pills */
+        .status-tag { font-size: 0.7rem; text-transform: uppercase; padding: 2px 8px; border-radius: 10px; margin-left: 10px; font-weight: bold; }
+        .period-tag { background: var(--period-color); color: white; margin-top: 5px; display: inline-block; }
+
+        /* Analysis Section */
+        #analysis {
+            margin-top: 40px;
+            padding: 20px;
+            background: white;
+            border: 1px solid var(--sage-green);
+            border-radius: 10px;
             width: 100%;
-            max-width: 500px;
-            margin-top: 50px;
+            max-width: 550px;
         }
 
-        .entry-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-            border-bottom: 1px solid transparent;
+        .controls { position: fixed; bottom: 20px; display: flex; gap: 10px; }
+        button { 
+            padding: 12px 20px; border-radius: 25px; border: none; cursor: pointer; 
+            font-weight: bold; background: var(--sage-green); color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
+        .btn-period { background: #e5989b; }
 
-        .day-label {
-            font-weight: bold;
-            min-width: 100px;
-        }
-
-        .content {
-            flex-grow: 1;
-            outline: none;
-            padding: 2px 5px;
-        }
-
-        /* Watercolor Pill Shapes */
-        .hl {
-            border-radius: 15px 50px 30px 15px;
-            padding: 2px 10px;
-            display: inline-block;
-        }
-
-        .creative { background: var(--hl-creative); }
-        .motivated { background: var(--hl-motivated); }
-        .unmotivated { background: var(--hl-unmotivated); }
-        .period { background: var(--hl-period); }
-
-        .add-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #a8dadc;
-            border: none;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            font-size: 30px;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
 
-    <div class="container" id="diary-container">
-        </div>
+    <div class="header">
+        <h2 style="color: var(--sage-green); margin: 0;">Monthly Cycle & Mindset</h2>
+        <small>Tracking patterns, one day at a time.</small>
+    </div>
 
-    <button class="add-btn" onclick="addEntry()">+</button>
+    <div class="container" id="diary-container"></div>
+
+    <div id="analysis">
+        <h3 style="color: var(--sage-green);">Monthly Insight</h3>
+        <p id="stats-text">Add entries to see your motivation vs. cycle analysis.</p>
+    </div>
+
+    <div class="controls">
+        <button onclick="addEntry('motivated')">High Energy</button>
+        <button onclick="addEntry('low')">Low Energy</button>
+        <button class="btn-period" onclick="addEntry('period')">+ Period Day</button>
+    </div>
 
     <script>
         const container = document.getElementById('diary-container');
 
-        // Function to add a new line
-        function addEntry(text = "") {
-            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            const today = days[new Date().getDay()];
+        function addEntry(type) {
+            const date = new Date();
+            const dateStr = date.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
             
             const div = document.createElement('div');
             div.className = 'entry-row';
             
-            // Logic to apply colors based on keywords
-            let highlightedText = text;
-            if(text.includes("creative")) highlightedText = `<span class="hl creative">${text}</span>`;
-            if(text.includes("motivated")) highlightedText = `<span class="hl motivated">${text}</span>`;
-            if(text.includes("unmotivated")) highlightedText = `<span class="hl unmotivated">${text}</span>`;
-            if(text.includes("period")) highlightedText = `<span class="hl period">${text}</span>`;
+            let bgColor = 'transparent';
+            let tag = '';
+            
+            if(type === 'motivated') { bgColor = 'var(--m-high)'; tag = 'High Motivation'; }
+            if(type === 'low') { bgColor = 'var(--m-low)'; tag = 'Resting'; }
+            if(type === 'period') { bgColor = 'var(--period-color)'; tag = 'Period Cycle'; }
+
+            div.style.backgroundColor = bgColor;
 
             div.innerHTML = `
-                <span class="day-label">${today}-</span>
-                <div class="content" contenteditable="true" oninput="saveData()">${highlightedText}</div>
+                <div class="day-info">
+                    ${dateStr}<br>
+                    <span class="status-tag">${tag}</span>
+                </div>
+                <div class="content-area" contenteditable="true" oninput="saveAndAnalyze()">...</div>
             `;
-            container.appendChild(div);
+            
+            container.prepend(div);
+            saveAndAnalyze();
         }
 
-        // Simple save to your browser
-        function saveData() {
-            localStorage.setItem('myDiaryData', container.innerHTML);
+        function saveAndAnalyze() {
+            const html = container.innerHTML;
+            localStorage.setItem('diary_v2', html);
+            
+            // Basic Analysis Logic
+            const entries = document.querySelectorAll('.entry-row').length;
+            const periods = document.querySelectorAll('.status-tag').textContent === 'Period Cycle'; // simplified
+            let periodCount = 0;
+            document.querySelectorAll('.status-tag').forEach(t => { if(t.innerText.includes('Period')) periodCount++; });
+            
+            const stats = document.getElementById('stats-text');
+            stats.innerHTML = `Total Logged Days: <b>${entries}</b> | Period Days: <b>${periodCount}</b><br>
+            <small>Tip: Look for clusters of "Resting" tags 2-3 days before a "Period Cycle" tag to predict your dip.</small>`;
         }
 
-        // Load data when you open the app
         window.onload = () => {
-            const saved = localStorage.getItem('myDiaryData');
-            if(saved) {
-                container.innerHTML = saved;
-            } else {
-                addEntry("Type 'motivated' or 'creative' to see the magic!");
-            }
-        }
+            const saved = localStorage.getItem('diary_v2');
+            if(saved) container.innerHTML = saved;
+        };
     </script>
 </body>
 </html>
