@@ -2,111 +2,142 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Rhythm of My Days</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MyRhythm">
+    
     <style>
         :root {
             --sage-green: #b2ac88;
-            --grid-color: #e8e8e8;
-            --text-main: #4a4a4a;
+            --soft-bg: #faf9f6;
+            --grid-color: rgba(232, 232, 232, 0.6);
+            --text-main: #5a5a5a;
         }
 
         body {
-            background-color: #faf9f6;
+            background-color: var(--soft-bg);
             background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
             background-size: 25px 25px;
-            font-family: 'Georgia', serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georgia, serif;
             color: var(--text-main);
-            padding: 20px;
             margin: 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--sage-green); width: 100%; max-width: 600px; padding-bottom: 10px;}
-        .container { width: 100%; max-width: 600px; padding-bottom: 200px; }
+        .header { text-align: center; margin-bottom: 25px; margin-top: 40px; width: 100%; max-width: 500px; }
+        .header h2 { color: var(--sage-green); font-weight: 300; font-style: italic; letter-spacing: 1px; margin-bottom: 5px; }
+        
+        #analysis {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+            border-radius: 15px;
+            padding: 12px;
+            width: 90%;
+            max-width: 450px;
+            font-size: 0.8rem;
+            text-align: center;
+            border: 1px solid rgba(178, 172, 136, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .container { width: 100%; max-width: 500px; padding-bottom: 220px; }
 
         .entry-row { 
-            display: flex; align-items: flex-start; margin-bottom: 12px; padding: 15px; 
-            border-radius: 12px; position: relative; border: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.02);
+            display: flex; align-items: flex-start; margin-bottom: 12px; padding: 18px; 
+            border-radius: 16px; position: relative;
+            animation: fadeIn 0.4s ease;
         }
 
-        .day-info { font-weight: bold; min-width: 85px; font-size: 0.8rem; line-height: 1.2; }
-        .content-area { flex-grow: 1; outline: none; padding-left: 15px; min-height: 24px; font-size: 1rem; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .delete-btn { cursor: pointer; font-size: 1.2rem; color: #bbb; border: none; background: none; margin-left: 5px; }
+        .day-info { font-weight: bold; min-width: 70px; font-size: 0.75rem; color: #777; }
+        .content-area { flex-grow: 1; outline: none; padding-left: 12px; font-size: 1rem; line-height: 1.4; color: #444; }
 
-        /* Step Slider Styles */
+        .delete-btn { cursor: pointer; font-size: 1.2rem; color: #ccc; border: none; background: none; padding: 0 5px; }
+
+        /* Minimalist Aesthetic Slider */
         .controls-panel {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(255, 255, 255, 0.98);
-            padding: 20px; border-top: 1px solid var(--sage-green);
-            display: flex; flex-direction: column; align-items: center; gap: 15px;
+            background: rgba(250, 249, 246, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px 20px 40px 20px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
+            z-index: 1000;
         }
 
-        .step-slider {
-            width: 80%; max-width: 400px; appearance: none; height: 8px; border-radius: 5px;
-            background: linear-gradient(to right, #9400D3, #0000FF, #00FF00, #FF7F00, #FF0000);
-            outline: none;
-        }
-        .step-slider::-webkit-slider-thumb {
-            appearance: none; width: 24px; height: 24px; background: white; 
-            border: 3px solid var(--sage-green); border-radius: 50%; cursor: pointer;
-        }
-
-        #analysis {
-            margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.8);
-            border: 1px solid var(--sage-green); border-radius: 10px;
-            width: 100%; max-width: 550px; font-size: 0.85rem;
-        }
-
-        .btn-group { display: flex; gap: 15px; }
-        button { padding: 12px 25px; border-radius: 25px; border: none; cursor: pointer; font-weight: bold; background: var(--sage-green); color: white; }
-        .btn-period { background: #e5989b; }
+        .slider-wrapper { width: 85%; max-width: 350px; position: relative; }
         
-        .level-labels { display: flex; justify-content: space-between; width: 80%; max-width: 400px; font-size: 0.7rem; color: #888; margin-top: -10px; }
+        .step-slider {
+            width: 100%; appearance: none; height: 4px; background: #e0e0e0; border-radius: 2px; outline: none;
+        }
+
+        .step-slider::-webkit-slider-thumb {
+            appearance: none; width: 22px; height: 22px; background: white; 
+            border: 2px solid var(--sage-green); border-radius: 50%; cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .labels { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.65rem; color: #999; letter-spacing: 1px; text-transform: uppercase; }
+
+        .btn-group { display: flex; gap: 15px; width: 85%; max-width: 350px; }
+        button { 
+            flex: 1; padding: 14px; border-radius: 12px; border: none; cursor: pointer; 
+            font-weight: 500; font-size: 0.9rem; transition: 0.2s;
+        }
+        .btn-log { background: var(--sage-green); color: white; }
+        .btn-period { background: #e8dcd8; color: #a67c7c; }
+        button:active { transform: scale(0.98); opacity: 0.9; }
+
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 style="color: var(--sage-green); font-style: italic; margin-bottom: 5px;">The Rhythm of My Days</h2>
-        <small style="letter-spacing: 1px; color: #888;">LAB WORK • LIFE • MOMENTS</small>
+        <h2>the rhythm of my days</h2>
     </div>
 
     <div id="analysis">
-        <div id="stats-content">Start your first log below...</div>
+        <div id="stats-content">waiting for your first light...</div>
     </div>
 
     <div class="container" id="diary-container"></div>
 
     <div class="controls-panel">
-        <input type="range" id="stepRange" class="step-slider" min="1" max="5" step="1" value="3">
-        <div class="level-labels">
-            <span>Resting</span>
-            <span>Low</span>
-            <span>Steady</span>
-            <span>Active</span>
-            <span>Peak</span>
+        <div class="slider-wrapper">
+            <input type="range" id="stepRange" class="step-slider" min="1" max="5" step="1" value="3">
+            <div class="labels">
+                <span>Rest</span>
+                <span>Low</span>
+                <span>Steady</span>
+                <span>High</span>
+                <span>Peak</span>
+            </div>
         </div>
         
         <div class="btn-group">
-            <button onclick="addEntry('mood')">Log Mindset</button>
-            <button class="btn-period" onclick="addEntry('period')">+ Period Day</button>
+            <button class="btn-log" onclick="addEntry('mood')">Log Mindset</button>
+            <button class="btn-period" onclick="addEntry('period')">Cycle</button>
         </div>
     </div>
 
     <script>
         const container = document.getElementById('diary-container');
 
-        const vibgyoMap = {
-            1: { name: "Violet", color: "rgba(148, 0, 211, 0.2)", label: "Resting" },
-            2: { name: "Blue", color: "rgba(0, 0, 255, 0.2)", label: "Low" },
-            3: { name: "Green", color: "rgba(0, 255, 0, 0.2)", label: "Steady" },
-            4: { name: "Orange", color: "rgba(255, 127, 0, 0.2)", label: "Active" },
-            5: { name: "Red", color: "rgba(255, 0, 0, 0.2)", label: "Peak" }
+        // Aesthetic VIBGYO - Muted Watercolor Tones
+        const moodPalette = {
+            1: { color: "rgba(180, 160, 200, 0.25)", label: "Resting" }, // Muted Violet
+            2: { color: "rgba(160, 180, 210, 0.25)", label: "Low" },     // Muted Blue
+            3: { color: "rgba(178, 172, 136, 0.25)", label: "Steady" },  // Sage
+            4: { color: "rgba(230, 200, 160, 0.25)", label: "Active" },  // Soft Orange
+            5: { color: "rgba(220, 150, 150, 0.25)", label: "Peak" }    // Soft Red
         };
 
         function addEntry(type) {
@@ -114,8 +145,8 @@
             const dateStr = date.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric' });
             const step = document.getElementById('stepRange').value;
             
-            const bgColor = (type === 'period') ? 'rgba(229, 152, 155, 0.5)' : vibgyoMap[step].color;
-            const moodLabel = (type === 'period') ? 'CYCLE' : vibgyoMap[step].label;
+            const bgColor = (type === 'period') ? 'rgba(215, 180, 180, 0.3)' : moodPalette[step].color;
+            const label = (type === 'period') ? 'Cycle' : moodPalette[step].label;
 
             const div = document.createElement('div');
             div.className = 'entry-row';
@@ -123,7 +154,7 @@
             div.setAttribute('data-val', type === 'period' ? 'P' : step);
 
             div.innerHTML = `
-                <div class="day-info">${dateStr}<br><small>${moodLabel}</small></div>
+                <div class="day-info">${dateStr}<br>${label}</div>
                 <div class="content-area" contenteditable="true" oninput="saveAndAnalyze()">...</div>
                 <button class="delete-btn" onclick="this.parentElement.remove(); saveAndAnalyze();">×</button>
             `;
@@ -132,32 +163,24 @@
         }
 
         function saveAndAnalyze() {
-            localStorage.setItem('diary_rhythm', container.innerHTML);
+            localStorage.setItem('diary_pwa_v1', container.innerHTML);
             const rows = document.querySelectorAll('.entry-row');
-            let totalSteps = 0;
-            let moodCount = 0;
-            let lastPeriod = "Not logged yet";
+            let total = 0, count = 0, lastP = "None";
 
             rows.forEach((row) => {
-                const val = row.getAttribute('data-val');
-                if(val === 'P') {
-                    if(lastPeriod === "Not logged yet") lastPeriod = row.querySelector('.day-info').innerText.split('\n')[0];
-                } else {
-                    totalSteps += parseInt(val);
-                    moodCount++;
-                }
+                const v = row.getAttribute('data-val');
+                if(v === 'P') { if(lastP === "None") lastP = row.querySelector('.day-info').innerText.split('\n')[0]; }
+                else { total += parseInt(v); count++; }
             });
 
-            const avg = moodCount > 0 ? Math.round(totalSteps / moodCount) : 0;
-            const trend = vibgyoMap[avg] ? vibgyoMap[avg].label : "Calibrating";
-
-            document.getElementById('stats-content').innerHTML = `
-                Current Rhythm: <strong>${trend}</strong> | Last Cycle Day: <strong>${lastPeriod}</strong>
-            `;
+            const avg = count > 0 ? Math.round(total / count) : 0;
+            const mood = moodPalette[avg] ? moodPalette[avg].label : "Steady";
+            document.getElementById('stats-content').innerHTML = 
+                `Average: <b>${mood}</b> &nbsp; | &nbsp; Last Cycle: <b>${lastP}</b>`;
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('diary_rhythm');
+            const saved = localStorage.getItem('diary_pwa_v1');
             if(saved) container.innerHTML = saved;
             saveAndAnalyze();
         };
