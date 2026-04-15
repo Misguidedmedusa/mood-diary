@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIBGYO Mindset Tracker</title>
+    <title>The Rhythm of My Days</title>
     <style>
         :root {
             --sage-green: #b2ac88;
@@ -24,66 +24,76 @@
             align-items: center;
         }
 
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--sage-green); width: 100%; max-width: 600px; }
-        .container { width: 100%; max-width: 600px; padding-bottom: 180px; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--sage-green); width: 100%; max-width: 600px; padding-bottom: 10px;}
+        .container { width: 100%; max-width: 600px; padding-bottom: 200px; }
 
         .entry-row { 
             display: flex; align-items: flex-start; margin-bottom: 12px; padding: 15px; 
             border-radius: 12px; position: relative; border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.02);
         }
 
         .day-info { font-weight: bold; min-width: 85px; font-size: 0.8rem; line-height: 1.2; }
         .content-area { flex-grow: 1; outline: none; padding-left: 15px; min-height: 24px; font-size: 1rem; }
 
-        .delete-btn { cursor: pointer; font-size: 1.2rem; color: #999; border: none; background: none; margin-left: 5px; }
+        .delete-btn { cursor: pointer; font-size: 1.2rem; color: #bbb; border: none; background: none; margin-left: 5px; }
 
-        /* VIBGYO Slider Styles */
+        /* Step Slider Styles */
         .controls-panel {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(255, 255, 255, 0.96);
-            padding: 15px; border-top: 2px solid var(--sage-green);
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 20px; border-top: 1px solid var(--sage-green);
+            display: flex; flex-direction: column; align-items: center; gap: 15px;
         }
 
-        .vibgyo-slider {
-            width: 80%; max-width: 400px; height: 10px;
-            border-radius: 5px; outline: none; appearance: none;
-            background: linear-gradient(to right, #9400D3, #4B0082, #0000FF, #00FF00, #FFFF00, #FF7F00, #FF0000);
+        .step-slider {
+            width: 80%; max-width: 400px; appearance: none; height: 8px; border-radius: 5px;
+            background: linear-gradient(to right, #9400D3, #0000FF, #00FF00, #FF7F00, #FF0000);
+            outline: none;
         }
-        .vibgyo-slider::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; background: white; border: 2px solid var(--sage-green); border-radius: 50%; cursor: pointer; }
+        .step-slider::-webkit-slider-thumb {
+            appearance: none; width: 24px; height: 24px; background: white; 
+            border: 3px solid var(--sage-green); border-radius: 50%; cursor: pointer;
+        }
 
         #analysis {
-            margin-bottom: 20px; padding: 15px; background: white;
+            margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.8);
             border: 1px solid var(--sage-green); border-radius: 10px;
-            width: 100%; max-width: 550px; font-size: 0.85rem; line-height: 1.4;
+            width: 100%; max-width: 550px; font-size: 0.85rem;
         }
 
-        .btn-group { display: flex; gap: 10px; }
-        button { padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; font-weight: bold; background: var(--sage-green); color: white; }
+        .btn-group { display: flex; gap: 15px; }
+        button { padding: 12px 25px; border-radius: 25px; border: none; cursor: pointer; font-weight: bold; background: var(--sage-green); color: white; }
         .btn-period { background: #e5989b; }
+        
+        .level-labels { display: flex; justify-content: space-between; width: 80%; max-width: 400px; font-size: 0.7rem; color: #888; margin-top: -10px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 style="color: var(--sage-green);">VIBGYO Analysis</h2>
+        <h2 style="color: var(--sage-green); font-style: italic; margin-bottom: 5px;">The Rhythm of My Days</h2>
+        <small style="letter-spacing: 1px; color: #888;">LAB WORK • LIFE • MOMENTS</small>
     </div>
 
     <div id="analysis">
-        <strong>Monthly Insights:</strong>
-        <div id="stats-content">Logging your first day...</div>
+        <div id="stats-content">Start your first log below...</div>
     </div>
 
     <div class="container" id="diary-container"></div>
 
     <div class="controls-panel">
-        <div style="font-size: 0.8rem; color: #666;">
-            Low Energy (V) <span style="margin: 0 40px;">→</span> High Energy (R)
+        <input type="range" id="stepRange" class="step-slider" min="1" max="5" step="1" value="3">
+        <div class="level-labels">
+            <span>Resting</span>
+            <span>Low</span>
+            <span>Steady</span>
+            <span>Active</span>
+            <span>Peak</span>
         </div>
-        <input type="range" id="vibRange" class="vibgyo-slider" min="0" max="100" value="50">
         
         <div class="btn-group">
-            <button onclick="addEntry('mood')">Log Entry</button>
+            <button onclick="addEntry('mood')">Log Mindset</button>
             <button class="btn-period" onclick="addEntry('period')">+ Period Day</button>
         </div>
     </div>
@@ -91,47 +101,29 @@
     <script>
         const container = document.getElementById('diary-container');
 
-        function getVibgyoColor(value) {
-            const colors = [
-                {p: 0, r: 148, g: 0, b: 211},   // Violet
-                {p: 17, r: 75, g: 0, b: 130},  // Indigo
-                {p: 33, r: 0, g: 0, b: 255},   // Blue
-                {p: 50, r: 0, g: 255, b: 0},   // Green
-                {p: 67, r: 255, g: 255, b: 0}, // Yellow
-                {p: 83, r: 255, g: 127, b: 0}, // Orange
-                {p: 100, r: 255, g: 0, b: 0}   // Red
-            ];
-            
-            let lower = colors[0];
-            let upper = colors[colors.length - 1];
-            for (let i = 0; i < colors.length - 1; i++) {
-                if (value >= colors[i].p && value <= colors[i+1].p) {
-                    lower = colors[i];
-                    upper = colors[i+1];
-                    break;
-                }
-            }
-            const range = upper.p - lower.p;
-            const factor = (value - lower.p) / (range || 1);
-            const r = Math.floor(lower.r + factor * (upper.r - lower.r));
-            const g = Math.floor(lower.g + factor * (upper.g - lower.g));
-            const b = Math.floor(lower.b + factor * (upper.b - lower.b));
-            return `rgba(${r}, ${g}, ${b}, 0.25)`;
-        }
+        const vibgyoMap = {
+            1: { name: "Violet", color: "rgba(148, 0, 211, 0.2)", label: "Resting" },
+            2: { name: "Blue", color: "rgba(0, 0, 255, 0.2)", label: "Low" },
+            3: { name: "Green", color: "rgba(0, 255, 0, 0.2)", label: "Steady" },
+            4: { name: "Orange", color: "rgba(255, 127, 0, 0.2)", label: "Active" },
+            5: { name: "Red", color: "rgba(255, 0, 0, 0.2)", label: "Peak" }
+        };
 
         function addEntry(type) {
             const date = new Date();
             const dateStr = date.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric' });
-            const val = document.getElementById('vibRange').value;
-            const bgColor = (type === 'period') ? 'rgba(229, 152, 155, 0.5)' : getVibgyoColor(val);
+            const step = document.getElementById('stepRange').value;
+            
+            const bgColor = (type === 'period') ? 'rgba(229, 152, 155, 0.5)' : vibgyoMap[step].color;
+            const moodLabel = (type === 'period') ? 'CYCLE' : vibgyoMap[step].label;
 
             const div = document.createElement('div');
             div.className = 'entry-row';
             div.style.backgroundColor = bgColor;
-            div.setAttribute('data-val', type === 'period' ? 'P' : val);
+            div.setAttribute('data-val', type === 'period' ? 'P' : step);
 
             div.innerHTML = `
-                <div class="day-info">${dateStr}<br><small>${type === 'period' ? 'CYCLE' : 'LEVEL: '+val}</small></div>
+                <div class="day-info">${dateStr}<br><small>${moodLabel}</small></div>
                 <div class="content-area" contenteditable="true" oninput="saveAndAnalyze()">...</div>
                 <button class="delete-btn" onclick="this.parentElement.remove(); saveAndAnalyze();">×</button>
             `;
@@ -140,37 +132,32 @@
         }
 
         function saveAndAnalyze() {
-            localStorage.setItem('diary_vibgyo', container.innerHTML);
+            localStorage.setItem('diary_rhythm', container.innerHTML);
             const rows = document.querySelectorAll('.entry-row');
-            let totalMood = 0;
+            let totalSteps = 0;
             let moodCount = 0;
-            let lastPeriod = "None";
+            let lastPeriod = "Not logged yet";
 
-            rows.forEach((row, index) => {
+            rows.forEach((row) => {
                 const val = row.getAttribute('data-val');
-                if(val === 'P' && lastPeriod === "None") {
-                    lastPeriod = row.querySelector('.day-info').innerText.split('\n')[0];
-                } else if (val !== 'P') {
-                    totalMood += parseInt(val);
+                if(val === 'P') {
+                    if(lastPeriod === "Not logged yet") lastPeriod = row.querySelector('.day-info').innerText.split('\n')[0];
+                } else {
+                    totalSteps += parseInt(val);
                     moodCount++;
                 }
             });
 
-            const avg = moodCount > 0 ? Math.round(totalMood / moodCount) : 0;
+            const avg = moodCount > 0 ? Math.round(totalSteps / moodCount) : 0;
+            const trend = vibgyoMap[avg] ? vibgyoMap[avg].label : "Calibrating";
+
             document.getElementById('stats-content').innerHTML = `
-                Avg Motivation: <b>${avg}%</b> | Last Period Start: <b>${lastPeriod}</b><br>
-                <em>Summary: You are currently trending in the <b>${getMoodName(avg)}</b> zone.</em>
+                Current Rhythm: <strong>${trend}</strong> | Last Cycle Day: <strong>${lastPeriod}</strong>
             `;
         }
 
-        function getMoodName(avg) {
-            if(avg < 30) return "Violet/Blue (Reflective)";
-            if(avg < 70) return "Green/Yellow (Balanced)";
-            return "Orange/Red (High Performance)";
-        }
-
         window.onload = () => {
-            const saved = localStorage.getItem('diary_vibgyo');
+            const saved = localStorage.getItem('diary_rhythm');
             if(saved) container.innerHTML = saved;
             saveAndAnalyze();
         };
