@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Aesthetic Diary</title>
+    <style>
+        :root {
+            --bg-color: #fdfcf8;
+            --grid-color: #e0e0e0;
+            --text-color: #4a4a4a;
+            /* Watercolor Palette */
+            --hl-creative: rgba(255, 183, 77, 0.5); /* Orange */
+            --hl-motivated: rgba(129, 199, 132, 0.5); /* Green */
+            --hl-unmotivated: rgba(100, 181, 246, 0.5); /* Blue */
+            --hl-period: rgba(239, 154, 154, 0.6); /* Red/Pink */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 30px 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 50px;
+        }
+
+        .entry-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            border-bottom: 1px solid transparent;
+        }
+
+        .day-label {
+            font-weight: bold;
+            min-width: 100px;
+        }
+
+        .content {
+            flex-grow: 1;
+            outline: none;
+            padding: 2px 5px;
+        }
+
+        /* Watercolor Pill Shapes */
+        .hl {
+            border-radius: 15px 50px 30px 15px;
+            padding: 2px 10px;
+            display: inline-block;
+        }
+
+        .creative { background: var(--hl-creative); }
+        .motivated { background: var(--hl-motivated); }
+        .unmotivated { background: var(--hl-unmotivated); }
+        .period { background: var(--hl-period); }
+
+        .add-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #a8dadc;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 30px;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="diary-container">
+        </div>
+
+    <button class="add-btn" onclick="addEntry()">+</button>
+
+    <script>
+        const container = document.getElementById('diary-container');
+
+        // Function to add a new line
+        function addEntry(text = "") {
+            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const today = days[new Date().getDay()];
+            
+            const div = document.createElement('div');
+            div.className = 'entry-row';
+            
+            // Logic to apply colors based on keywords
+            let highlightedText = text;
+            if(text.includes("creative")) highlightedText = `<span class="hl creative">${text}</span>`;
+            if(text.includes("motivated")) highlightedText = `<span class="hl motivated">${text}</span>`;
+            if(text.includes("unmotivated")) highlightedText = `<span class="hl unmotivated">${text}</span>`;
+            if(text.includes("period")) highlightedText = `<span class="hl period">${text}</span>`;
+
+            div.innerHTML = `
+                <span class="day-label">${today}-</span>
+                <div class="content" contenteditable="true" oninput="saveData()">${highlightedText}</div>
+            `;
+            container.appendChild(div);
+        }
+
+        // Simple save to your browser
+        function saveData() {
+            localStorage.setItem('myDiaryData', container.innerHTML);
+        }
+
+        // Load data when you open the app
+        window.onload = () => {
+            const saved = localStorage.getItem('myDiaryData');
+            if(saved) {
+                container.innerHTML = saved;
+            } else {
+                addEntry("Type 'motivated' or 'creative' to see the magic!");
+            }
+        }
+    </script>
+</body>
+</html>
